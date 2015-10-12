@@ -7,7 +7,6 @@ hdparm.tcz
 parted.tcz
 python.tcz
 python-dev.tcz
-qemu-common.tcz
 raid-dm-3.16.6-tinycore64.tcz
 scsi-3.16.6-tinycore64.tcz
 udev-lib.tcz

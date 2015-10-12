@@ -1,3 +1,6 @@
 *.gz
 *.zip
 *.tar.gz
+tinyipabuild
+*.vmlinuz
+vmlinuz64
