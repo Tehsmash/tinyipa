@@ -15,7 +15,6 @@ cd build_files
 wget -N http://distro.ibiblio.org/tinycorelinux/6.x/x86_64/release/distribution_files/corepure64.gz
 wget -N http://distro.ibiblio.org/tinycorelinux/6.x/x86_64/release/distribution_files/vmlinuz64
 wget -N http://tarballs.openstack.org/ironic-python-agent/ironic-python-agent-master.tar.gz
-wget -N https://github.com/fujita/tgt/archive/v1.0.51.zip
 cd $cwd
 
 # Make directory for building in
@@ -23,9 +22,6 @@ mkdir $builddir
 
 # Extract rootfs from .gz file
 ( cd $builddir && zcat ../build_files/corepure64.gz | sudo cpio -i -H newc -d )
-
-# Install TGT source files into ramdisk
-unzip build_files/v1.0.51.zip -d $builddir/tmp
 
 # Create directory for python local mirror
 mkdir -p $builddir/tmp/localpip
@@ -62,8 +58,19 @@ cat ../onboot.lst | sed "s/\(.*\)/http:\/\/distro\.ibiblio\.org\/tinycorelinux\/
 set +e
 ls *.tcz | sed "s/\(.*\)/http:\/\/distro\.ibiblio\.org\/tinycorelinux\/6\.x\/x86_64\/tcz\/\1.dep/" | xargs wget -N -q
 set -e
+
+# Install qemu utils
+cp $cwd/build_files/qemu-utils.* .
+echo "qemu-utils.tcz" >> ../onboot.lst
+
+# Install tgt
+cp $cwd/build_files/tgt.* .
+echo "tgt.tcz" >> ../onboot.lst
+
+# Get inital list of dependencies to pull
 files="`comm -23 <(awk 1 *.dep | sed -e "s/\s//" | grep -v ^$ | sort -u) <(ls *.tcz | sort -u)`"
 
+# Loop until all dependencies are satified
 while [ ! -z "$files" ]
 do
   # Parse dep files and download missing tczs
@@ -75,6 +82,7 @@ do
   files="`comm -23 <(awk 1 *.dep | sed -e "s/\s//" | grep -v ^$ | sort -u) <(ls *.tcz | sort -u)`"
 done
 cd $cwd
+
 
 # Copy bootlocal.sh to opt
 sudo cp build_files/bootlocal.sh $builddir/opt/.

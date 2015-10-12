@@ -4,3 +4,4 @@
 tinyipabuild
 *.vmlinuz
 vmlinuz64
+*.iso
